@@ -1,13 +1,16 @@
 package basic.service;
 
 import basic.dto.MemberDto;
+import basic.dto.UserSession;
 import basic.entity.Member;
 import basic.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -16,9 +19,11 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final UserSessionService userSessionService;
 
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository, UserSessionService userSessionService) {
         this.memberRepository = memberRepository;
+        this.userSessionService = userSessionService;
     }
 
     // 회원가입
@@ -31,7 +36,7 @@ public class MemberService {
     }
 
     // 로그인
-    public String login(String username, String password, HttpSession session, Model model) {
+    public String login(String username, String password, HttpServletRequest request, Model model) {
 
         Optional<Member> findMember = memberRepository.findByUsername(username);
 
@@ -46,9 +51,22 @@ public class MemberService {
             return "index";
         }
 
-        session.setAttribute("loginMember", member);
-        return "redirect:/home";
+        /**
+         * 추가 사항
+         */
+        HttpSession session = request.getSession();
+        UserSession userSession = UserSession.builder()
+                .userId(member.getId().toString())
+                .username(member.getUsername())
+                .loginTime(LocalDateTime.now())
+                .ipAddress(request.getRemoteAddr())
+                .userAgent(request.getHeader("User-Agent"))
+                .build();
 
+        userSessionService.login(session, userSession);
+
+//        session.setAttribute("loginMember", member);
+        return "redirect:/home";
     }
 
     private void validateDuplicateMember(MemberDto memberDto) {

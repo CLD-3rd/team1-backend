@@ -1,6 +1,7 @@
 package basic.controller;
 
 import basic.dto.ItemResponse;
+import basic.dto.UserSession;
 import basic.entity.Item;
 import basic.entity.Member;
 import basic.entity.Order;
@@ -42,24 +43,18 @@ public class OrderController {
             @RequestParam Long itemId,
             @RequestParam int count) {
 
-        Member loginMember = (Member) session.getAttribute("loginMember");
-        if (loginMember == null) {
-            throw new IllegalStateException("로그인 정보가 없습니다.");
-        }
+        UserSession userSession = getUserSession(session);
 
-        orderService.order(loginMember.getId(), itemId, count);
+        orderService.order(Long.valueOf(userSession.getUserId()), itemId, count);
         return "redirect:/orders";
     }
 
 
     @GetMapping
     public String orderList(HttpSession session, Model model) {
-        Member loginMember = (Member) session.getAttribute("loginMember");
-        if (loginMember == null) {
-            throw new IllegalStateException("로그인 정보가 없습니다.");
-        }
+        UserSession userSession = getUserSession(session);
 
-        List<Order> orders = orderService.findOrdersByMemberId(loginMember.getId());
+        List<Order> orders = orderService.findOrdersByMemberId(Long.valueOf(userSession.getUserId()));
         model.addAttribute("orders", orders);
         return "orders/orderList";
     }
@@ -71,5 +66,13 @@ public class OrderController {
     public String cancelOrder(@PathVariable Long orderId) {
         orderService.cancelOrder(orderId);
         return "redirect:/orders";
+    }
+
+    private static UserSession getUserSession(HttpSession session) {
+        UserSession userSession = (UserSession) session.getAttribute("userSession");
+        if (userSession == null) {
+            throw new IllegalStateException("로그인 정보가 없습니다.");
+        }
+        return userSession;
     }
 }

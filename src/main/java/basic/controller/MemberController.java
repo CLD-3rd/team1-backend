@@ -1,9 +1,12 @@
 package basic.controller;
 
 import basic.dto.MemberDto;
-import basic.entity.Member;
+import basic.dto.UserSession;
 import basic.service.MemberService;
+import basic.service.UserSessionService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +17,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Optional;
 
 @Controller
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
+    private final UserSessionService userSessionService;
 
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, UserSessionService userSessionService) {
         this.memberService = memberService;
+        this.userSessionService = userSessionService;
     }
 
     @GetMapping("/")
@@ -47,17 +53,20 @@ public class MemberController {
 
     // 로그인 처리
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password, Model model, HttpSession session) {
-        return memberService.login(username, password, session, model);
+    public String login(@RequestParam String username, @RequestParam String password, Model model, HttpServletRequest request) {
+        return memberService.login(username, password, request, model);
     }
 
     @GetMapping("/home")
     public String homePage(HttpSession session, Model model) {
-        Member member = (Member) session.getAttribute("loginMember");
-        if (member == null) {
+
+        UserSession userSession = (UserSession) session.getAttribute("userSession");
+
+        if (userSession == null) {
+            log.info("세션이 존재하지 않습니다.");
             return "redirect:/";
         }
-        model.addAttribute("member", member);
+        model.addAttribute("username", userSession.getUsername());
         return "home";
     }
 }
