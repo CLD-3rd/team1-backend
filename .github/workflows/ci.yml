@@ -70,4 +70,21 @@ jobs:
       - name: Push Docker image to Amazon ECR
         run: |
           docker push ${{ secrets.AWS_ECR_PRIVATE_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_PRIVATE_REPOSITORY }}:${{ env.SHORT_SHA }}
+      
+      # GitHub Actions에서 manigest image 태그를 변경
+      # - name: Update image tag
+      #   run: |
+      #     sed -i "s|image: .*|image: 116981781177.dkr.ecr.ap-northeast-2.amazonaws.com/test:${{ github.sha }}|" k8s/deployment.yaml
 
+      # GitHub Actions에서 YAML을 Git에 커밋 & push
+      # - name: Commit and push
+      #   run: |
+      #     git config user.name "GitHub Actions"
+      #     git config user.email "actions@github.com"
+      #     git add k8s/deployment.yaml
+      #     git commit -m "Update image tag to ${{ github.sha }}"
+      #     git push origin main
+
+
+      # ArgoCD Git 변경 감지 후 EKS에 배포 (kubectl apply)
+      # deployment에 ecr 이미지 주소
