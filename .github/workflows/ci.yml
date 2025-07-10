@@ -74,7 +74,7 @@ jobs:
       # GitHub Actions에서 manigest image 태그를 변경
       # - name: Update image tag
       #   run: |
-      #     sed -i "s|image: .*|image: 116981781177.dkr.ecr.ap-northeast-2.amazonaws.com/test:${{ github.sha }}|" k8s/deployment.yaml
+      #     sed -i "s|image: .*|image: <이미지주소>:${{ github.sha }}|" k8s/deployment.yaml
 
       # GitHub Actions에서 YAML을 Git에 커밋 & push
       # - name: Commit and push
