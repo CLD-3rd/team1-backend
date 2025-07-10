@@ -390,3 +390,4 @@ terraform.rc
 application.properties
 application.properties.template
 .env
+.vscode/
