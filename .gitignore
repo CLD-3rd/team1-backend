@@ -391,3 +391,8 @@ application.properties
 application.properties.template
 .env
 .vscode/
+.classpath
+.project
+target/classes/META-INF/MANIFEST.MF
+target/classes/META-INF/maven/basic/basic/pom.properties
+target/classes/META-INF/maven/basic/basic/pom.xml
