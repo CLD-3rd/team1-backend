@@ -25,21 +25,31 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("${spring.data.redis.password}")
-    String password;
+//    @Value("${spring.data.redis.password}")
+//    String password;
 
     // Redis 커넥션 객체 생성
+//    @Bean
+//    public LettuceConnectionFactory redisConnectionFactory() {
+//        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
+//        config.setPassword(password);
+//        return new LettuceConnectionFactory(config);
+//    }
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-        config.setPassword(password);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName("eks-redis.pvirqp.0001.apn2.cache.amazonaws.com"); // ElastiCache 엔드포인트
+        config.setPort(6379); // 기본 포트, 필요하면 변경
+        // 만약 암호 설정되어 있다면
+        // config.setPassword("your_redis_password");
         return new LettuceConnectionFactory(config);
     }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
+        //template.setConnectionFactory(connectionFactory);
+        template.setConnectionFactory(redisConnectionFactory());
 
         // Object Mapper
         ObjectMapper mapper = new ObjectMapper();
@@ -59,12 +69,12 @@ public class RedisConfig {
     }
 
     // Key와 Value가 모두 String일 때 사용하는 간편 템플릿
-    @Bean
-    public StringRedisTemplate stringRedisTemplate() {
-        StringRedisTemplate template = new StringRedisTemplate();
-        template.setConnectionFactory(redisConnectionFactory());
-        return template;
-    }
+//    @Bean
+//    public StringRedisTemplate stringRedisTemplate() {
+//        StringRedisTemplate template = new StringRedisTemplate();
+//        template.setConnectionFactory(redisConnectionFactory());
+//        return template;
+//    }
 
     @Bean
     public ObjectMapper objectMapper() {
