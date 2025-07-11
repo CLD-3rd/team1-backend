@@ -1,8 +1,9 @@
 name: Vinyl-Groove With Github Actions with ArgoCD
 
 on:
-  workflow_dispatch
-  # push
+  push:
+    branches:
+      - cicd
 
 jobs:
   ci:
