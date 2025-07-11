@@ -69,4 +69,15 @@ public class MemberController {
         model.addAttribute("username", userSession.getUsername());
         return "home";
     }
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request, HttpSession session) {
+        UserSession userSession = (UserSession) session.getAttribute("userSession");
+        if (userSession != null) {
+            log.info("로그아웃: 사용자 [{}] 세션 종료", userSession.getUsername());
+        } else {
+            log.info("로그아웃 요청, 하지만 세션이 없습니다.");
+        }
+        session.invalidate(); 
+        return "redirect:/";
+    }
 }
