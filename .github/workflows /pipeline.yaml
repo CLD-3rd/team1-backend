@@ -84,18 +84,21 @@ jobs:
     - name: Set SHORT_SHA env
       run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-    # ================================== 
-    # 이미지 태그 업데이트 - 두 가지 방법  
-    # ================================== 
-
-    #- name: Update image tag with sed
-    #  run: |
-    #    sed -i "s/newTag: \".*\"/newTag: \"${{ env.SHORT_SHA }}\"/" ./manifest/overlays/dev/kustomization.yaml
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+    
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
     - name: Update image tag with kustomize edit
       run: |
         cd team1-manifest/manifest/overlays/dev
-        kustomize edit set image h6bro/app-with-argocd-integrated=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ env.SHORT_SHA }}
+        kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/vinyl-groove:${{ env.SHORT_SHA }}
 
     - name: Commit and push changes
       run: |
