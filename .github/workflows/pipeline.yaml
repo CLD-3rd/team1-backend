@@ -1,4 +1,4 @@
-name: Vinyl-Groove With Github Actions with ArgoCD
+name: Vinyl-Groove With Github Actions with ArgoCD 
 
 on:
   #workflow_dispatch
