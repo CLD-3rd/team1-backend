@@ -42,16 +42,16 @@ jobs:
         name: app
         path: ./target/*.jar
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:  
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:  
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v2
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -62,12 +62,19 @@ jobs:
     - name: Set SHORT_SHA env
       run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-    - name: Build and push to ECR (PRIVATE)
+    # - name: Build and push to ECR (ECR PRIVATE)
+    #   uses: docker/build-push-action@v6
+    #   with:
+    #     context: .
+    #     push: true
+    #     tags: ${{ steps.login-ecr.outputs.registry }}/vinyl-groove:${{ env.SHORT_SHA }}
+
+    - name: Build and push
       uses: docker/build-push-action@v6
       with:
         context: .
         push: true
-        tags: ${{ steps.login-ecr.outputs.registry }}/vinyl-groove:${{ env.SHORT_SHA }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ env.SHORT_SHA }}
 
 
   cd:
@@ -86,21 +93,26 @@ jobs:
     - name: Set SHORT_SHA env
       run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: ${{ secrets.AWS_REGION }}
     
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v2
+
+    # - name: Update image tag with kustomize edit
+    #   run: |
+    #     cd team1-manifest/manifest/overlays/dev
+    #     kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/vinyl-groove:${{ env.SHORT_SHA }}
 
     - name: Update image tag with kustomize edit
       run: |
-        cd team1-manifest/manifest/overlays/dev
-        kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/vinyl-groove:${{ env.SHORT_SHA }}
+        cd app-with-argocd-manifest/manifest/overlays/dev
+        kustomize edit set image h6bro/app-with-argocd-integrated=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ env.SHORT_SHA }}
 
     - name: Commit and push changes
       run: |
