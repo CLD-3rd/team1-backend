@@ -111,8 +111,8 @@ jobs:
 
     - name: Update image tag with kustomize edit
       run: |
-        cd app-with-argocd-manifest/manifest/overlays/dev
-        kustomize edit set image h6bro/app-with-argocd-integrated=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ env.SHORT_SHA }}
+        cd team1-manifest/manifest/overlays/dev
+        kustomize edit set image h6bro/vinyl-app-repo=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${{ env.SHORT_SHA }}
 
     - name: Commit and push changes
       run: |
