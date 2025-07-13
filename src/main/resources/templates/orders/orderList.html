@@ -214,43 +214,53 @@
         }
     </style>
 </head>
-<body>
-<div class="container">
-    <div class="vinyl-header">
-        <div class="vinyl-spinner"></div>
-        <h1>Order List</h1>
-        <div class="vinyl-spinner"></div>
+    <body>
+    <div class="container">
+        <div class="vinyl-header">
+            <div class="vinyl-spinner"></div>
+            <h1>Order List</h1>
+            <div class="vinyl-spinner"></div>
+        </div>
+
+        <div>
+            <strong>총 주문 건수: <span th:text="${#lists.size(orders)}">0</span>건</strong>
+        </div>
+
+        <table class="order-table">
+            <thead>
+            <tr>
+                <th>주문 상품</th>
+                <th>개별 수량</th>
+                <th>총 주문 수량</th>
+                <th>총 주문 금액</th>
+                <th>주문 날짜</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}">
+                <td>
+                    <ul>
+                        <li th:each="orderItem : ${order.orderItems}" th:text="${orderItem.item.name}">상품명</li>
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        <li th:each="orderItem : ${order.orderItems}" th:text="${orderItem.count}">수량</li>
+                    </ul>
+                </td>
+                <td th:text="${order.getTotalCount()}"></td>
+
+                <td th:text="${#numbers.formatInteger(order.getTotalPrice(), 3, 'COMMA')} + '원'"></td>
+
+                <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:class="${order.status.name() == 'CANCEL'} ? 'status-cancelled' : 'status-ordered'"
+                    th:text="${order.status.name()}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <a th:href="@{/home}" class="home-link">홈으로 돌아가기</a>
     </div>
-
-    <table class="order-table">
-        <thead>
-        <tr>
-            <th>상품명</th>
-            <th>수량</th>
-            <th>주문 날짜</th>
-            <th>상태</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="order : ${orders}">
-            <td>
-                <ul>
-                    <li th:each="item : ${order.orderItems}" th:text="${item.item.name}"></li>
-                </ul>
-            </td>
-            <td>
-                <ul>
-                    <li th:each="item : ${order.orderItems}" th:text="${item.count}"></li>
-                </ul>
-            </td>
-            <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
-            <td th:class="${order.status == 'CANCEL'} ? 'status-cancelled' : 'status-ordered'"
-                th:text="${order.status}"></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <a th:href="@{/home}" class="home-link">홈으로 돌아가기</a>
-</div>
-</body>
+    </body>
 </html>

@@ -1,9 +1,6 @@
 package basic.service;
 
-import basic.entity.Item;
-import basic.entity.Member;
-import basic.entity.Order;
-import basic.entity.OrderItem;
+import basic.entity.*;
 import basic.repository.ItemRepository;
 import basic.repository.MemberRepository;
 import basic.repository.OrderRepository;
@@ -11,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -41,6 +39,27 @@ public class OrderService {
         //주문 저장
         orderRepository.save(order);
         return order.getId();
+    }
+
+    /** 장바구니 주문 */
+    @Transactional
+    public void orderFromCart(Long memberId, List<CartItem> cartItems) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 회원입니다."));
+
+        List<OrderItem> orderItems = cartItems.stream()
+                .map(cartItem -> {
+                    Item item = itemRepository.findById(cartItem.getItem().getId())
+                            .orElseThrow(() -> new IllegalStateException("존재하지 않는 상품입니다."));
+                    return OrderItem.createOrderItem(item, item.getPrice(), cartItem.getCount());
+                })
+                .collect(Collectors.toList());
+
+
+        Order order = Order.createOrder(member, orderItems.toArray(new OrderItem[0]));
+
+        orderRepository.save(order);
+
     }
 
 

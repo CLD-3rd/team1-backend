@@ -44,6 +44,24 @@
             margin: 0 auto;
         }
 
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            border: 1px solid #d4af37;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background-color: #d4af37;
+            color: #121212;
+        }
+
         h1 {
             color: #d4af37;
             font-family: 'Playfair Display', serif;
@@ -145,24 +163,6 @@
             background-color: #c9a227;
         }
 
-        .add-product {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background-color: #1a1a1a;
-            color: #d4af37;
-            text-decoration: none;
-            border: 1px solid #d4af37;
-            border-radius: 4px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .add-product:hover {
-            background-color: #d4af37;
-            color: #121212;
-        }
-
         .vinyl-header {
             display: flex;
             justify-content: center;
@@ -196,6 +196,9 @@
 </head>
 <body>
 <div class="container">
+    <!-- 돌아가기 링크 -->
+    <a th:href="@{/home}" class="back-link">← 돌아가기</a>
+
     <div class="vinyl-header">
         <div class="vinyl-icon"></div>
         <h1>Jazz LP Collection</h1>
@@ -217,8 +220,6 @@
             <a th:href="@{|/items/${item.id}|}" class="item-link">View Details</a>
         </div>
     </div>
-
-    <a th:href="@{/items/new}" class="add-product">+ Add New LP</a>
 </div>
 </body>
 </html>

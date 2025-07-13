@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Item {
+public class Item extends BaseEntity{
 
     @Id @GeneratedValue
     @Column(name = "item_id")
