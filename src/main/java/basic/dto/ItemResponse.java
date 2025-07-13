@@ -11,17 +11,19 @@ public class ItemResponse {
     private int stockQuantity;
     private String imageFileName;
     private String imageUrl;
+    private String sellerName;
 
     public ItemResponse() {
     }
 
-    public ItemResponse(Long id, String name, int price, int stockQuantity, String imageFileName, String imageUrl) {
+    public ItemResponse(Long id, String name, int price, int stockQuantity, String imageFileName, String imageUrl, String sellerName) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.imageFileName = imageFileName;
         this.imageUrl = imageUrl;
+        this.sellerName = sellerName;
     }
 
     public static ItemResponse fromEntity(Item item, String bucketUrl) {
@@ -29,6 +31,7 @@ public class ItemResponse {
         if (item.getImageFileName() != null) {
             fullImageUrl = bucketUrl + item.getImageFileName();
         }
-        return new ItemResponse(item.getId(), item.getName(), item.getPrice(), item.getStockQuantity(), item.getImageFileName(), fullImageUrl );
+        return new ItemResponse(item.getId(), item.getName(), item.getPrice(), item.getStockQuantity(),
+                                item.getImageFileName(), fullImageUrl, item.getMember().getUsername());
     }
 }

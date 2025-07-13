@@ -228,6 +228,11 @@
         <div class="detail-label">In Stock</div>
         <div class="detail-value" th:text="${item.stockQuantity} + 'available'"></div>
       </div>
+
+      <div class="detail-item">
+        <div class="detail-label">Seller</div>
+        <div class="detail-value" th:text="${item.sellerName}">판매자</div>
+      </div>
     </div>
   </div>
 

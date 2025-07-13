@@ -12,6 +12,10 @@ public class Item {
     @Column(name = "item_id")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     private String name;
 
     private int price;
@@ -22,15 +26,16 @@ public class Item {
 
     protected Item() {}
 
-    private Item(String name, int price, int stockQuantity, String imageFileName){
+    private Item(Member member, String name, int price, int stockQuantity, String imageFileName){
+        this.member = member;
         this.name = name;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.imageFileName = imageFileName;
     }
 
-    public static Item of(String name, int price, int stockQuantity, String imageFileName) {
-        return new Item(name, price, stockQuantity, imageFileName);
+    public static Item of(Member member, String name, int price, int stockQuantity, String imageFileName) {
+        return new Item(member, name, price, stockQuantity, imageFileName);
     }
 
     public void addStock(int quantity) {

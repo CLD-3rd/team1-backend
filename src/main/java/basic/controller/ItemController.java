@@ -5,6 +5,7 @@ import basic.dto.ItemResponse;
 import basic.entity.Item;
 import basic.service.ItemService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,10 +41,10 @@ public class ItemController {
 
     // 상품 등록 처리
     @PostMapping("/new")
-    public String create(@ModelAttribute("item") ItemRequest itemRequest, @RequestPart("file") MultipartFile file, HttpServletRequest request) {
-        log.debug("Request content type: {}", request.getContentType());
+    public String create(@ModelAttribute("item") ItemRequest itemRequest, @RequestPart("file") MultipartFile file, HttpSession httpSession) {
+
         log.debug("File present: {}", file != null);
-        itemService.saveItem(itemRequest, file);
+        itemService.saveItem(itemRequest, file, httpSession);
         return "redirect:/home";
     }
 
