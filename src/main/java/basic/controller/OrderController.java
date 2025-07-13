@@ -20,59 +20,51 @@ import java.util.List;
 @RequestMapping("/orders")
 public class OrderController {
 
-    private final OrderService orderService;
-    private final ItemService itemService;
+	private final OrderService orderService;
+	private final ItemService itemService;
+	public OrderController(OrderService orderService, ItemService itemService) {
+		this.orderService = orderService;
+		this.itemService = itemService;
+	}
 
+	@GetMapping("/new")
+	public String createDto(Model model) {
+		List<ItemResponse> items = itemService.findItems();
+		model.addAttribute("items", items);
+		return "orders/createOrderDto";
+	}
 
-    public OrderController(OrderService orderService, ItemService itemService) {
-        this.orderService = orderService;
-        this.itemService = itemService;
-    }
+	@PostMapping("/new")
+	public String order(HttpSession session, // 또는 @AuthenticationPrincipal 사용 가능
+			@RequestParam Long itemId, @RequestParam int count) {
 
+		UserSession userSession = getUserSession(session);
 
-    @GetMapping("/new")
-    public String createDto(Model model) {
-        List<ItemResponse> items = itemService.findItems();
-        model.addAttribute("items", items);
-        return "orders/createOrderDto";
-    }
+		orderService.order(Long.valueOf(userSession.getUserId()), itemId, count);
+		return "redirect:/orders";
+	}
 
-    @PostMapping("/new")
-    public String order(
-            HttpSession session,  // 또는 @AuthenticationPrincipal 사용 가능
-            @RequestParam Long itemId,
-            @RequestParam int count) {
+	@GetMapping
+	public String orderList(HttpSession session, Model model) {
+		UserSession userSession = getUserSession(session);
 
-        UserSession userSession = getUserSession(session);
-
-        orderService.order(Long.valueOf(userSession.getUserId()), itemId, count);
-        return "redirect:/orders";
-    }
-
-
-    @GetMapping
-    public String orderList(HttpSession session, Model model) {
-        UserSession userSession = getUserSession(session);
-
-        List<Order> orders = orderService.findOrdersByMemberId(Long.valueOf(userSession.getUserId()));
-        model.addAttribute("orders", orders);
-        return "orders/orderList";
-    }
-
-    /**
-     * 주문 취소
-     */
-    @PostMapping("/{orderId}/cancel")
-    public String cancelOrder(@PathVariable Long orderId) {
-        orderService.cancelOrder(orderId);
-        return "redirect:/orders";
-    }
-
-    private static UserSession getUserSession(HttpSession session) {
-        UserSession userSession = (UserSession) session.getAttribute("userSession");
-        if (userSession == null) {
-            throw new IllegalStateException("로그인 정보가 없습니다.");
-        }
-        return userSession;
-    }
+		List<Order> orders = orderService.findOrdersByMemberId(Long.valueOf(userSession.getUserId()));
+		model.addAttribute("orders", orders);
+		return "orders/orderList";
+	}
+	/**
+	 * 주문 취소
+	 */
+	@PostMapping("/{orderId}/cancel")
+	public String cancelOrder(@PathVariable Long orderId) {
+		orderService.cancelOrder(orderId);
+		return "redirect:/orders";
+	}
+	private static UserSession getUserSession(HttpSession session) {
+		UserSession userSession = (UserSession) session.getAttribute("userSession");
+		if (userSession == null) {
+			throw new IllegalStateException("로그인 정보가 없습니다.");
+		}
+		return userSession;
+	}
 }
