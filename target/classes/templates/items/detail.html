@@ -141,6 +141,12 @@
       width: 80px;
     }
 
+    .button-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
     .buy-button {
       background-color: #d4af37;
       color: #121212;
@@ -154,10 +160,32 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       font-family: 'Playfair Display', serif;
+      flex: 1;
     }
 
     .buy-button:hover {
       background-color: #c9a227;
+      transform: translateY(-2px);
+    }
+
+    .cart-button {
+      background-color: #444;
+      color: #fff;
+      border: none;
+      padding: 14px 30px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Playfair Display', serif;
+      flex: 1;
+    }
+
+    .cart-button:hover {
+      background-color: #555;
       transform: translateY(-2px);
     }
 
@@ -226,7 +254,7 @@
 
       <div class="detail-item">
         <div class="detail-label">In Stock</div>
-        <div class="detail-value" th:text="${item.stockQuantity} + 'available'"></div>
+        <div class="detail-value" th:text="${item.stockQuantity}"></div>
       </div>
 
       <div class="detail-item">
@@ -236,15 +264,26 @@
     </div>
   </div>
 
-  <div class="order-form">
-    <form th:action="@{/orders/new}" method="post">
-      <input type="hidden" name="itemId" th:value="${item.id}" />
+  <!-- 수량 입력 필드 -->
+  <div class="form-group">
+    <label for="count">Quantity:</label>
+    <input type="number" id="count" name="count" min="1" value="1" required />
+  </div>
 
-      <div class="form-group">
-        <label for="count">Quantity:</label>
-        <input type="number" id="count" name="count" min="1" value="1" required />
-        <button type="submit" class="buy-button">Buy</button>
-      </div>
+  <!-- 버튼 컨테이너 추가 -->
+  <div class="button-container">
+    <!-- 바로 구매 폼 -->
+    <form th:action="@{/orders/new}" method="post" style="margin: 0; flex: 1;">
+      <input type="hidden" name="itemId" th:value="${item.id}" />
+      <input type="hidden" name="count" id="buyCountHidden" />
+      <button type="submit" class="buy-button" onclick="document.getElementById('buyCountHidden').value = document.getElementById('count').value;">Buy</button>
+    </form>
+
+    <!-- 장바구니 담기 폼 -->
+    <form th:action="@{/cart/add}" method="post" style="margin: 0; flex: 1;">
+      <input type="hidden" name="itemId" th:value="${item.id}" />
+      <input type="hidden" name="count" id="cartCountHidden" />
+      <button type="submit" class="cart-button" onclick="document.getElementById('cartCountHidden').value = document.getElementById('count').value;">Add to Cart</button>
     </form>
   </div>
 

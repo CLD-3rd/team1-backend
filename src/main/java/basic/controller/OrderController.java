@@ -2,9 +2,11 @@ package basic.controller;
 
 import basic.dto.ItemResponse;
 import basic.dto.UserSession;
+import basic.entity.CartItem;
 import basic.entity.Item;
 import basic.entity.Member;
 import basic.entity.Order;
+import basic.service.CartService;
 import basic.service.ItemService;
 import basic.service.MemberService;
 import basic.service.OrderService;
@@ -22,13 +24,13 @@ public class OrderController {
 
     private final OrderService orderService;
     private final ItemService itemService;
+    private final CartService cartService;
 
-
-    public OrderController(OrderService orderService, ItemService itemService) {
+    public OrderController(OrderService orderService, ItemService itemService, CartService cartService) {
         this.orderService = orderService;
         this.itemService = itemService;
+        this.cartService = cartService;
     }
-
 
     @GetMapping("/new")
     public String createDto(Model model) {
@@ -49,6 +51,19 @@ public class OrderController {
         return "redirect:/orders";
     }
 
+    @PostMapping("/cart")
+    public String orderFromCart(HttpSession session) {
+        UserSession userSession = getUserSession(session);
+        Long memberId = Long.valueOf(userSession.getUserId());
+
+        List<CartItem> cartItems = cartService.getCart(memberId);
+
+        orderService.orderFromCart(memberId, cartItems);
+
+        cartService.clearCart(memberId);
+        return "redirect:/orders";
+    }
+
 
     @GetMapping
     public String orderList(HttpSession session, Model model) {
@@ -60,7 +75,7 @@ public class OrderController {
     }
 
     /**
-     * 주문 취소
+     * 주문 취소:
      */
     @PostMapping("/{orderId}/cancel")
     public String cancelOrder(@PathVariable Long orderId) {
