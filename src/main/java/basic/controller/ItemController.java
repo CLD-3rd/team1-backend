@@ -1,8 +1,8 @@
 package basic.controller;
-
+import basic.cachedto.LpSalesDto;
 import basic.dto.ItemRequest;
 import basic.dto.ItemResponse;
-import basic.entity.Item;
+import basic.service.CounterService;
 import basic.service.ItemService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -21,13 +21,20 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
+   	private final CounterService counterService;
+	public ItemController(ItemService itemService, CounterService counterService) {
+		this.itemService = itemService;
+		this.counterService = counterService;
+	}
 
     @GetMapping("/list")
     public String getAllItems(Model model) {
         List<ItemResponse> items = itemService.findItems();
+		List<LpSalesDto> topSales = itemService.getTopSales(5);
+		List<Long> topItemIds = topSales.stream().map(LpSalesDto::getId).toList();
+		log.info("🔥 인기 상품 목록: {}", topSales);
+		model.addAttribute("popularItems", topSales);
+		model.addAttribute("popularItemIds", topItemIds);
         model.addAttribute("items", items);
         return "items/list";
     }
@@ -51,8 +58,10 @@ public class ItemController {
     // 상품 상세 (또는 수정폼으로 활용 가능)
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
+		Long viewCount = counterService.incrementViewCount(id);
         ItemResponse item = itemService.findOne(id);
         model.addAttribute("item", item);
+		model.addAttribute("viewCount", viewCount);
         return "items/detail";
     }
 }
