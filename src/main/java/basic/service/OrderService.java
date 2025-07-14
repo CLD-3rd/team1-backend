@@ -1,5 +1,6 @@
 package basic.service;
 
+import basic.entity.*;
 import basic.cachedto.OrderCacheDto;
 import basic.entity.Item;
 import basic.entity.Member;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -68,10 +70,33 @@ public class OrderService {
 		// String key = ODER_CACHE_KEY + savedOrder.getId();
 		redisTemplate.opsForValue().set(key, cachedList, Duration.ofDays(1));
 
-		// LP 판매량 증가
+				// LP 판매량 증가
 		lpRedisRepository.increaseSales("lp:sales", itemId, count);
 		return order.getId();
 	}
+
+
+    /** 장바구니 주문 */
+    @Transactional
+    public void orderFromCart(Long memberId, List<CartItem> cartItems) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 회원입니다."));
+
+        List<OrderItem> orderItems = cartItems.stream()
+                .map(cartItem -> {
+                    Item item = itemRepository.findById(cartItem.getItem().getId())
+                            .orElseThrow(() -> new IllegalStateException("존재하지 않는 상품입니다."));
+                    return OrderItem.createOrderItem(item, item.getPrice(), cartItem.getCount());
+                })
+                .collect(Collectors.toList());
+
+
+        Order order = Order.createOrder(member, orderItems.toArray(new OrderItem[0]));
+
+        orderRepository.save(order);
+
+    }
+
 
 	/** 주문 취소 */
 	@Transactional

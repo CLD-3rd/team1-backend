@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "orders")
 @Getter
-public class Order {
+public class Order extends BaseEntity{
 
     @Id
     @GeneratedValue
@@ -62,6 +62,12 @@ public class Order {
         for (OrderItem orderItem : orderItems) {
             orderItem.cancel();
         }
+    }
+
+    public int getTotalCount() {
+        return this.orderItems.stream()
+                .mapToInt(OrderItem::getCount)
+                .sum();
     }
 
     public int getTotalPrice() {
