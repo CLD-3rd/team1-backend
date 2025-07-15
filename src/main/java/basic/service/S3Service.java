@@ -80,7 +80,8 @@ public class S3Service {
 
     private AttachmentFile createAttachmentFile(MultipartFile file) {
         UUID uuid = UUID.randomUUID();
-        String savePath = "C://Cloud Engineering//98.data//" + DIR_NAME;
+//        String savePath = "C://Cloud Engineering//98.data//" + DIR_NAME;
+        String savePath = "/home/ubuntu/" + DIR_NAME;
         String attachmentOriginalFileName = file.getOriginalFilename();
         String attachmentFileName = uuid.toString() + "_" + attachmentOriginalFileName;
         Long attachmentFileSize = file.getSize();
