@@ -32,7 +32,7 @@ public class RedisConfig {
 	@Bean
 	public LettuceConnectionFactory redisConnectionFactory() {
 		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-		config.setPassword(password);
+		//config.setPassword(password);
 		config.setPort(6379);
 		config.setDatabase(0); // 세션은 0, redisson은 1로 분리
 		return new LettuceConnectionFactory(config);
