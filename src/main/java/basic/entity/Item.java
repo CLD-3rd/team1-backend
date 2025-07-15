@@ -34,10 +34,20 @@ public class Item extends BaseEntity{
         this.imageFileName = imageFileName;
     }
 
+    private Item(Member member, String name, int price, int stockQuantity){
+        this.member = member;
+        this.name = name;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+    }
+
     public static Item of(Member member, String name, int price, int stockQuantity, String imageFileName) {
         return new Item(member, name, price, stockQuantity, imageFileName);
     }
 
+    public static Item tempOf(Member member, String name, int price, int stockQuantity) {
+        return new Item(member, name, price, stockQuantity);
+    }
     public void addStock(int quantity) {
         this.stockQuantity += quantity;
     }

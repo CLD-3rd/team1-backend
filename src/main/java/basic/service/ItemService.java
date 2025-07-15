@@ -45,25 +45,34 @@ public class ItemService {
     public void saveItem(ItemRequest itemRequest, MultipartFile file, HttpSession session) {
         String uploadedFileName = null;
 
-        if (file != null && !file.isEmpty()) {
-            try {
-                uploadedFileName = s3Service.uploadS3File(file);
-            } catch (IOException e) {
-                throw new RuntimeException("이미지 업로드 실패", e);
-            }
-        }
+//        if (file != null && !file.isEmpty()) {
+//            try {
+//                uploadedFileName = s3Service.uploadS3File(file);
+//            } catch (IOException e) {
+//                throw new RuntimeException("이미지 업로드 실패", e);
+//            }
+//        }
 
         Long memberId = Long.valueOf(getUserSession(session).getUserId());
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new IllegalStateException("존재하지 않는 회원입니다."));
 
         log.info("uploadFileName = {}", uploadedFileName);
-        Item item = Item.of(
-                findMember,
-                itemRequest.getName(),
-                itemRequest.getPrice(),
-                itemRequest.getStockQuantity(),
-                uploadedFileName // 업로드된 파일명을 저장
-        );
+        Item item = null;
+        if (file == null && file.isEmpty()) {
+            item = Item.tempOf(
+                    findMember,
+                    itemRequest.getName(),
+                    itemRequest.getPrice(),
+                    itemRequest.getStockQuantity());
+        }else {
+            item = Item.of(
+                    findMember,
+                    itemRequest.getName(),
+                    itemRequest.getPrice(),
+                    itemRequest.getStockQuantity(),
+                    uploadedFileName // 업로드된 파일명을 저장
+                    );
+        }
 
         itemRepository.save(item);
     }

@@ -57,7 +57,7 @@ public class ItemController {
 
     // 상품 등록 처리
     @PostMapping("/new")
-    public String create(@ModelAttribute("item") ItemRequest itemRequest, @RequestPart("file") MultipartFile file, HttpSession httpSession) {
+    public String create(@ModelAttribute("item") ItemRequest itemRequest, @RequestPart(required = false, name = "file") MultipartFile file, HttpSession httpSession) {
 
         log.debug("File present: {}", file != null);
         itemService.saveItem(itemRequest, file, httpSession);
