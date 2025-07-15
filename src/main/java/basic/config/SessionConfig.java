@@ -73,8 +73,8 @@ public class SessionConfig {
 	public RedissonClient redissonClient() {
 		Config config = new Config();
 		String redisUrl = String.format("redis://%s:%d", redisHost, redisPort);
-		config.useSingleServer().setAddress(redisUrl).setPassword(redisPassword.isEmpty() ? null : redisPassword)
-				.setDatabase(1); // 세션은 0, redisson은 1로 분리
+//		config.useSingleServer().setAddress(redisUrl).setPassword(redisPassword.isEmpty() ? null : redisPassword).setDatabase(1); // 세션은 0, redisson은 1로 분리
+		config.useSingleServer().setAddress(redisUrl).setDatabase(1); // 세션은 0, redisson은 1로 분리
 		return Redisson.create(config);
 	}
 
